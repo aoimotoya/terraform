@@ -9,8 +9,8 @@ terraform {
 }
 
 provider "google" {
-  project = "aoimotoya-websites"
-  region  = "asia-northeast1"
+  project = var.project
+  region  = var.region
 }
 
 resource "random_id" "bucket_suffix" {

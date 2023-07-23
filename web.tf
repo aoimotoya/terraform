@@ -31,8 +31,28 @@ resource "google_storage_bucket" "top" {
   }
 }
 
+resource "google_storage_bucket" "blog" {
+  name          = "web-blog-${random_id.bucket_suffix.hex}"
+  location      = "asia-northeast1"
+  storage_class = "STANDARD"
+  force_destroy = true
+
+  uniform_bucket_level_access = true
+
+  website {
+    main_page_suffix = "index.html"
+    not_found_page   = "404.html"
+  }
+}
+
 resource "google_storage_bucket_iam_member" "top" {
   bucket = google_storage_bucket.top.name
+  role   = "roles/storage.objectViewer"
+  member = "allUsers"
+}
+
+resource "google_storage_bucket_iam_member" "blog" {
+  bucket = google_storage_bucket.blog.name
   role   = "roles/storage.objectViewer"
   member = "allUsers"
 }

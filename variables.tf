@@ -10,5 +10,6 @@ variable "domain_names" {
   type = map(any)
   default = {
     top  = "aoimotoya.net"
+    blog = "blog.aoimotoya.net"
   }
 }

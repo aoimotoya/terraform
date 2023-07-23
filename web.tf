@@ -31,8 +31,8 @@ resource "google_storage_bucket" "top" {
   }
 }
 
-resource "google_storage_bucket_access_control" "public_rule" {
-  bucket = google_storage_bucket.top.id
-  role   = "READER"
-  entity = "allUsers"
+resource "google_storage_bucket_iam_member" "top" {
+  bucket = google_storage_bucket.top.name
+  role   = "roles/storage.objectViewer"
+  member = "allUsers"
 }

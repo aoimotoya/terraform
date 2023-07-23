@@ -1,18 +1,3 @@
-terraform {
-  cloud {
-    organization = "aoimotoya"
-
-    workspaces {
-      name = "web"
-    }
-  }
-}
-
-provider "google" {
-  project = var.project
-  region  = var.region
-}
-
 resource "random_id" "bucket_suffix" {
   byte_length = 8
 }

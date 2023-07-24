@@ -1,9 +1,5 @@
-resource "google_compute_global_address" "top" {
-  name = "top-lb-ip"
-}
-
-resource "google_compute_global_address" "blog" {
-  name = "blog-lb-ip"
+resource "google_compute_global_address" "default" {
+  name = "web-lb-ip"
 }
 
 resource "google_compute_backend_bucket" "top" {
@@ -16,52 +12,39 @@ resource "google_compute_backend_bucket" "blog" {
   bucket_name = google_storage_bucket.blog.name
 }
 
-resource "google_compute_url_map" "top" {
-  name            = "top-url-map"
+resource "google_compute_url_map" "default" {
+  name            = "web-url-map"
   default_service = google_compute_backend_bucket.top.id
+
+  host_rule {
+    hosts        = [var.domain_names.blog]
+    path_matcher = "blog"
+  }
+
+  path_matcher {
+    name            = "blog"
+    default_service = google_compute_backend_bucket.blog.id
+  }
 }
 
-resource "google_compute_url_map" "blog" {
-  name            = "blog-url-map"
-  default_service = google_compute_backend_bucket.blog.id
-}
-
-resource "google_compute_target_https_proxy" "top" {
-  name    = "top-https-proxy"
-  url_map = google_compute_url_map.top.id
+resource "google_compute_target_https_proxy" "default" {
+  name    = "https-proxy"
+  url_map = google_compute_url_map.default.id
   ssl_certificates = [
-    google_compute_managed_ssl_certificate.top.name
-  ]
-  depends_on = [
-    google_compute_managed_ssl_certificate.top
-  ]
-}
-
-resource "google_compute_target_https_proxy" "blog" {
-  name    = "blog-https-proxy"
-  url_map = google_compute_url_map.blog.id
-  ssl_certificates = [
+    google_compute_managed_ssl_certificate.top.name,
     google_compute_managed_ssl_certificate.blog.name
   ]
   depends_on = [
+    google_compute_managed_ssl_certificate.top,
     google_compute_managed_ssl_certificate.blog
   ]
 }
 
-resource "google_compute_global_forwarding_rule" "top_https" {
-  name                  = "top-https-lb-forwarding-rule"
+resource "google_compute_global_forwarding_rule" "default" {
+  name                  = "https-lb-forwarding-rule"
   ip_protocol           = "TCP"
   load_balancing_scheme = "EXTERNAL_MANAGED"
   port_range            = "443"
-  target                = google_compute_target_https_proxy.top.id
-  ip_address            = google_compute_global_address.top.id
-}
-
-resource "google_compute_global_forwarding_rule" "blog_https" {
-  name                  = "blog-https-lb-forwarding-rule"
-  ip_protocol           = "TCP"
-  load_balancing_scheme = "EXTERNAL_MANAGED"
-  port_range            = "443"
-  target                = google_compute_target_https_proxy.blog.id
-  ip_address            = google_compute_global_address.blog.id
+  target                = google_compute_target_https_proxy.default.id
+  ip_address            = google_compute_global_address.default.id
 }

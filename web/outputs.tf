@@ -6,8 +6,5 @@ output "bucket_name" {
 }
 
 output "ip_address" {
-  value = [
-    google_compute_global_address.top.address,
-    google_compute_global_address.blog.address
-  ]
+  value = google_compute_global_address.default.address
 }

@@ -17,7 +17,7 @@ resource "google_compute_url_map" "default" {
   default_service = google_compute_backend_bucket.top.id
 
   host_rule {
-    hosts        = [var.domain_names.blog]
+    hosts        = [local.domain_names.blog]
     path_matcher = "blog"
   }
 

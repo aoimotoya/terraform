@@ -9,10 +9,10 @@ terraform {
 }
 
 provider "google" {
-  project = var.project
-  region  = var.region
+  project = local.project
+  region  = local.region
 }
 
 provider "google-beta" {
-  project = var.project
+  project = local.project
 }
